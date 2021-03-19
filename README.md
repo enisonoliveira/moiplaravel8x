@@ -1,4 +1,4 @@
-# moiplaravel8x
+# moiplaravel8.x
 -> pacote moip para rodar no php 7.2.4 ao 8.2 
 -> Laravel 8.x
 

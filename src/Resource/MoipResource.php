@@ -13,7 +13,7 @@ use Requests_Exception;
 use stdClass;
 use Session;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
+
 
 /**
  * Class MoipResource.
@@ -61,8 +61,6 @@ abstract class MoipResource implements JsonSerializable
         $this->moip = $moip;
         $this->data = new stdClass();
         $this->initialize();
-        $this->log= new LogController(new Request());
-        $this->keyOperation=(int) Session::get('idbrascob');
     }
 
     /**
@@ -239,38 +237,23 @@ abstract class MoipResource implements JsonSerializable
                 $body = null;
             }
         }
-        $this->log->logDBAll($this->keyOperation,"JSON DE ENVIO","JSON DE ENVIO", $payload);
         try {
             $http_response = $http_sess->request($path, $headers, $body, $method);
 
         } catch (Requests_Exception $e) {
-            $this->log->logDB($this->keyOperation,"Send Moip error","error UnexpectedException", "empty");
-            $this->log->logDB($this->keyOperation,"MoipResource","send moipapp transaction", $e);
-
-
             throw new Exceptions\UnexpectedException($e);
         }
 
         $code = $http_response->status_code;
         $response_body = $http_response->body;
         if ($code >= 200 && $code < 300) {
-            $this->log->logDBAll($this->keyOperation,"JSon de resposta transação","Resposta",  $http_response);
             return json_decode($response_body);
         } elseif ($code == 401) {
-            $this->log->logDB($this->keyOperation,$code,"error 401", $response_body );
-            $this->log->logDB($this->keyOperation,"json recuperado"," data", $payload);
             throw new Exceptions\UnautorizedException();
         } elseif ($code >= 400 && $code <= 499) {
             $errors = Exceptions\Error::parseErrors($response_body);
-            $this->log->logDB($this->keyOperation,$code,"error 401;499",$response_body);
-            $this->log->logDB($this->keyOperation,"json recuperado"," data", $payload);
-
             throw new Exceptions\ValidationException($code, $errors);
         }
-
-        $this->log->logDB($this->keyOperation,$code,"error UnexpectedException",$response_body );
-        $this->log->logDB($this->keyOperation,"json recuperado"," data",$payload);
-
         throw new Exceptions\UnexpectedException();
     }
 

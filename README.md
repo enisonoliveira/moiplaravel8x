@@ -18,7 +18,7 @@ configuração em app.php adicione as confings do moip
  
  "autoload": {
         "psr-4": 
-            "Moip\\": "moipapp/src"
+            "Moip\\": "moiplaravel8x/src"
         }
     },
     
